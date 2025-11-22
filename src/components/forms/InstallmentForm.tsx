@@ -11,6 +11,25 @@ import { useInstallments } from "@/hooks/useInstallments";
 import { useClients } from "@/hooks/useClients";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import { adjustDueDateForWeekend, WeekendHandling } from "@/lib/weekendUtils";
+
+const installmentFormSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+  protocol: z.string().min(1, "Protocolo é obrigatório"),
+  client_id: z.string().min(1, "Selecione um cliente"),
+  installment_number: z.coerce.number().min(1, "Número da parcela deve ser maior que 0"),
+  total_installments: z.coerce.number().min(1, "Total de parcelas deve ser maior que 0"),
+  due_date: z.date({ required_error: "Selecione a data de vencimento" }),
+  weekend_handling: z.enum(["advance", "postpone", "next_business_day"]),
+  status: z.enum(["pending", "paid", "overdue"]).default("pending"),
+});
+
+type InstallmentFormValues = z.infer<typeof installmentFormSchema>;
+
 interface InstallmentFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -27,7 +46,6 @@ export function InstallmentForm({ open, onOpenChange }: InstallmentFormProps) {
       total_installments: 1,
       weekend_handling: "next_business_day",
       status: "pending",
-      amount: 0,
     },
   });
 
@@ -44,7 +62,7 @@ export function InstallmentForm({ open, onOpenChange }: InstallmentFormProps) {
       due_date: format(adjustedDueDate, "yyyy-MM-dd"),
       weekend_handling: data.weekend_handling,
       status: data.status,
-      amount: data.amount,
+      amount: 0,
     } as any);
 
     form.reset();
@@ -165,57 +183,6 @@ export function InstallmentForm({ open, onOpenChange }: InstallmentFormProps) {
 
             <FormField
               control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Valor da Parcela</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="0.00"
-                      {...field}
-                      className="h-10"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="installment_number"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Número da Parcela *</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="1" placeholder="1" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="total_installments"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Total de Parcelas *</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="1" placeholder="12" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
               name="due_date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
@@ -226,7 +193,7 @@ export function InstallmentForm({ open, onOpenChange }: InstallmentFormProps) {
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full pl-3 text-left font-normal",
+                            "w-full pl-3 text-left font-normal h-10",
                             !field.value && "text-muted-foreground"
                           )}
                         >
@@ -261,7 +228,7 @@ export function InstallmentForm({ open, onOpenChange }: InstallmentFormProps) {
                   <FormLabel>Tratamento de Final de Semana</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-10">
                         <SelectValue />
                       </SelectTrigger>
                     </FormControl>
@@ -284,7 +251,7 @@ export function InstallmentForm({ open, onOpenChange }: InstallmentFormProps) {
                   <FormLabel>Status</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-10">
                         <SelectValue />
                       </SelectTrigger>
                     </FormControl>

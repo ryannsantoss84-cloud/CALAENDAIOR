@@ -31,7 +31,7 @@ export default function Installments() {
   });
 
   const filteredInstallments = enrichedInstallments.filter((installment) => {
-    const matchesSearch = 
+    const matchesSearch =
       installment.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       installment.protocol?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       installment.deadline?.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -51,7 +51,7 @@ export default function Installments() {
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold">Parcelamentos</h1>
+          <h1 className="text-3xl font-bold tracking-tight gradient-text-primary">Parcelamentos</h1>
           <p className="text-muted-foreground mt-1">
             Gerencie todas as parcelas de seus prazos
           </p>

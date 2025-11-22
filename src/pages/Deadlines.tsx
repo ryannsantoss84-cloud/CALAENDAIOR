@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle, Trash2, RefreshCw, ChevronLeft, ChevronRight, LayoutGrid, List as ListIcon } from "lucide-react";
+import { CheckCircle, Trash2, RefreshCw, ChevronLeft, ChevronRight, LayoutGrid, List as ListIcon, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,19 +12,22 @@ import {
 } from "@/components/ui/select";
 import { DeadlineCard } from "@/components/deadlines/DeadlineCard";
 import { DeadlineForm } from "@/components/forms/DeadlineForm";
-import { useDeadlines } from "@/hooks/useDeadlines";
+import { useDeadlines, Deadline } from "@/hooks/useDeadlines";
 import { useClients } from "@/hooks/useClients";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { StatusBadge } from "@/components/shared/StatusBadge";
+import { useSorting } from "@/hooks/useSorting";
+import { SortableColumn } from "@/components/shared/SortableColumn";
 
 export default function Deadlines() {
   // Estados de Filtro e Paginação
   const [page, setPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const pageSize = viewMode === 'grid' ? 12 : 20; // Lista cabe mais itens
+  const pageSize = viewMode === 'grid' ? 12 : 20;
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -34,8 +37,10 @@ export default function Deadlines() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const { sortConfig, handleSort, sortData } = useSorting<Deadline>('due_date');
+
   // Hook com Paginação e Filtros no Backend
-  const { deadlines, totalCount, isLoading, updateDeadline, deleteDeadline } = useDeadlines({
+  const { deadlines: dataDeadlines, totalCount, isLoading, updateDeadline, deleteDeadline } = useDeadlines({
     page,
     pageSize,
     searchTerm,
@@ -43,6 +48,8 @@ export default function Deadlines() {
     typeFilter,
     clientFilter
   });
+
+  const deadlines = sortData(dataDeadlines || []);
 
   const { clients } = useClients({ pageSize: 100 });
 
@@ -103,7 +110,7 @@ export default function Deadlines() {
   const handleGenerateMonthly = async () => {
     setIsGenerating(true);
     try {
-      const { data, error } = await supabase.rpc('generate_monthly_obligations', {
+      const { data, error } = await (supabase.rpc as any)('generate_monthly_obligations', {
         target_date: new Date().toISOString().split('T')[0]
       });
 
@@ -125,7 +132,7 @@ export default function Deadlines() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Prazos Fiscais</h1>
+          <h1 className="text-3xl font-bold tracking-tight gradient-text-primary">Prazos Fiscais</h1>
           <p className="text-muted-foreground mt-1">
             Gerencie obrigações e impostos ({totalCount} registros)
           </p>
@@ -255,22 +262,53 @@ export default function Deadlines() {
                 </div>
               ) : (
                 <div className="bg-card rounded-xl border shadow-sm overflow-hidden">
-                  <div className="grid grid-cols-[auto_1fr_1fr_auto_auto_auto] gap-4 p-4 border-b bg-muted/30 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <div className="grid grid-cols-[auto_1fr_1fr_1fr_1fr_auto_auto] gap-4 p-4 border-b bg-muted/30 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     <div className="w-8 text-center">
                       <Checkbox
                         checked={deadlines.length > 0 && selectedIds.size === deadlines.length}
                         onCheckedChange={toggleSelectAll}
                       />
                     </div>
-                    <div>Título</div>
-                    <div>Cliente</div>
-                    <div>Vencimento</div>
-                    <div>Status</div>
+                    <SortableColumn
+                      label="Título"
+                      sortKey="title"
+                      currentSortKey={sortConfig.key as string}
+                      currentSortDirection={sortConfig.direction}
+                      onSort={handleSort}
+                    />
+                    <SortableColumn
+                      label="Cliente"
+                      sortKey="clients.name"
+                      currentSortKey={sortConfig.key as string}
+                      currentSortDirection={sortConfig.direction}
+                      onSort={handleSort}
+                    />
+                    <SortableColumn
+                      label="Competência"
+                      sortKey="reference_date"
+                      currentSortKey={sortConfig.key as string}
+                      currentSortDirection={sortConfig.direction}
+                      onSort={handleSort}
+                    />
+                    <SortableColumn
+                      label="Vencimento"
+                      sortKey="due_date"
+                      currentSortKey={sortConfig.key as string}
+                      currentSortDirection={sortConfig.direction}
+                      onSort={handleSort}
+                    />
+                    <SortableColumn
+                      label="Status"
+                      sortKey="status"
+                      currentSortKey={sortConfig.key as string}
+                      currentSortDirection={sortConfig.direction}
+                      onSort={handleSort}
+                    />
                     <div className="text-right">Ações</div>
                   </div>
                   <div className="divide-y">
                     {deadlines.map((deadline) => (
-                      <div key={deadline.id} className={`grid grid-cols-[auto_1fr_1fr_auto_auto_auto] gap-4 p-4 items-center hover:bg-muted/5 transition-colors ${selectedIds.has(deadline.id) ? 'bg-primary/5' : ''}`}>
+                      <div className="grid grid-cols-[auto_1fr_1fr_1fr_1fr_auto_auto] gap-4 p-4 items-center hover:bg-muted/5 transition-colors ${selectedIds.has(deadline.id) ? 'bg-primary/5' : ''}">
                         <div className="w-8 text-center">
                           <Checkbox
                             checked={selectedIds.has(deadline.id)}
@@ -279,6 +317,11 @@ export default function Deadlines() {
                         </div>
                         <div className="font-medium text-sm">{deadline.title}</div>
                         <div className="text-sm text-muted-foreground">{deadline.clients?.name}</div>
+                        <div className="text-sm font-mono">
+                          {deadline.reference_date
+                            ? format(new Date(deadline.reference_date), "MMM/yyyy", { locale: ptBR })
+                            : '-'}
+                        </div>
                         <div className="text-sm font-mono">{format(new Date(deadline.due_date), "dd/MM/yyyy")}</div>
                         <div><StatusBadge status={deadline.status} variant="compact" /></div>
                         <div className="text-right">
@@ -298,14 +341,26 @@ export default function Deadlines() {
           {/* Paginação */}
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-8 pb-8">
-              <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
-                <ChevronLeft className="h-4 w-4 mr-1" /> Anterior
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Anterior
               </Button>
-              <span className="text-sm font-medium mx-4 text-muted-foreground">
-                Página <span className="text-foreground font-bold">{page}</span> de {totalPages}
+              <span className="text-sm font-medium mx-4">
+                Página {page} de {totalPages}
               </span>
-              <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
-                Próximo <ChevronRight className="h-4 w-4 ml-1" />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+              >
+                Próximo
+                <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
           )}

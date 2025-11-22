@@ -1,200 +1,146 @@
-# 🧪 Guia de Testes - Funcionalidades Implementadas
+# 🧪 Guia de Testes - Sistema de Controle Fiscal
 
-## 🌐 Acesso ao Sistema
-**URL:** http://127.0.0.1:8080
+## ✅ Checklist de Funcionalidades Corrigidas
 
-O servidor está rodando e pronto para testes!
+### 1️⃣ Visualização Lista/Blocos (Prazos e Clientes)
 
----
+**Como testar:**
+1. Acesse a página **Prazos**
+2. No canto superior direito, procure pelos botões de visualização (ícones de grade e lista)
+3. Clique no ícone de **Lista** (três linhas horizontais)
+   - ✅ Deve mostrar os prazos em formato de tabela
+4. Clique no ícone de **Blocos** (grade)
+   - ✅ Deve mostrar os prazos em cards
+5. Repita o mesmo teste na página **Clientes**
 
-## ✅ Teste 1: Botão de Menu (Sidebar Toggle)
-
-### Objetivo:
-Verificar se o botão de menu permite abrir e fechar a sidebar sem problemas.
-
-### Passos:
-1. Abra o navegador e acesse `http://127.0.0.1:8080`
-2. Localize o **botão de menu** (ícone ☰) no **canto superior esquerdo** da barra superior
-3. Clique no botão para **fechar a sidebar**
-   - ✅ A sidebar deve colapsar (ficar estreita)
-   - ✅ O botão ☰ continua visível
-4. Clique novamente no botão ☰ para **reabrir a sidebar**
-   - ✅ A sidebar deve expandir novamente
-   - ✅ Os nomes dos menus devem aparecer
-
-### Resultado Esperado:
-- ✅ Botão sempre visível na barra superior
-- ✅ Sidebar abre e fecha suavemente
-- ✅ Sem problemas para reabrir após fechar
+**Resultado esperado:**
+- Alternância suave entre os modos
+- Todos os dados devem aparecer em ambos os formatos
+- A preferência deve ser mantida enquanto você navega
 
 ---
 
-## ✅ Teste 2: Formulário de Clientes - Novos Campos
+### 2️⃣ Data de Conclusão (Completed_at)
 
-### Objetivo:
-Verificar os 3 novos campos: Tipo de Atividade, Estado e Cidade.
+**Como testar:**
+1. Acesse a página **Prazos**
+2. Encontre um prazo com status **Pendente**
+3. Clique em **Concluir**
+   - ✅ Deve aparecer a data de conclusão (data de hoje)
+4. Clique em **Reabrir**
+   - ✅ A data de conclusão deve DESAPARECER
+5. Clique em **Concluir** novamente
+   - ✅ Deve aparecer uma NOVA data de conclusão (atualizada)
 
-### Passos:
-1. No menu lateral, clique em **"Clientes"**
-2. Clique no botão **"Novo Cliente"** (canto superior direito)
-3. O formulário deve abrir com os seguintes campos:
-
-#### Campos Existentes:
-- Nome *
-- CNPJ *
-- Regime Tributário *
-- Email
-- Telefone
-
-#### ✨ NOVOS CAMPOS (verifique):
-
-**a) Tipo de Atividade *** (logo após Regime Tributário)
-- Deve ser um dropdown com 3 opções:
-  - ✅ Comércio
-  - ✅ Serviço
-  - ✅ Comércio e Serviço
-
-**b) Estado *** e **Cidade *** (em duas colunas lado a lado)
-- **Estado:** Dropdown com todos os estados brasileiros
-  - Formato: "SP - São Paulo", "RJ - Rio de Janeiro", etc.
-- **Cidade:** Campo de texto livre
-  - Inicialmente **desabilitado** (cinza)
-
-### Teste de Interação Estado → Cidade:
-1. Selecione um estado (ex: "SP - São Paulo")
-   - ✅ O campo Cidade deve ser **habilitado**
-2. Digite o nome de uma cidade (ex: "Campinas")
-   - ✅ Deve aceitar texto livre
-3. Mude o estado para outro (ex: "RJ - Rio de Janeiro")
-   - ✅ O campo Cidade deve ser **limpo automaticamente**
-
-### Teste de Validação:
-1. Tente salvar o formulário sem preencher os novos campos
-   - ✅ Deve mostrar mensagens de erro:
-     - "Selecione o tipo de atividade"
-     - "Estado é obrigatório"
-     - "Cidade é obrigatória"
-
-### Resultado Esperado:
-- ✅ 3 novos campos visíveis
-- ✅ Cidade desabilita/habilita conforme estado
-- ✅ Validação funcionando
-- ✅ Formulário maior (max-w-2xl) para acomodar campos
+**Resultado esperado:**
+- Ao concluir: mostra "Concluída em DD/MM/AAAA"
+- Ao reabrir: a data some completamente
+- Ao concluir de novo: mostra a nova data atual
 
 ---
 
-## ✅ Teste 3: Ações em Massa nos Prazos
+### 3️⃣ Formulário de Parcelamento (Sem Duplicatas)
 
-### Objetivo:
-Verificar a funcionalidade de seleção e ações em massa.
+**Como testar:**
+1. Acesse a página **Parcelamentos**
+2. Clique em **Novo Parcelamento** (botão +)
+3. Verifique os campos do formulário:
+   - ✅ Nome do Parcelamento
+   - ✅ Protocolo
+   - ✅ Cliente
+   - ✅ Número da Parcela (aparece APENAS UMA VEZ)
+   - ✅ Total de Parcelas (aparece APENAS UMA VEZ)
+   - ✅ Data de Vencimento
+   - ✅ Tratamento de Final de Semana
+   - ✅ Status
+   - ❌ NÃO deve ter campo "Valor da Parcela"
+   - ❌ NÃO deve ter campos duplicados
 
-### Passos:
-1. No menu lateral, clique em **"Prazos"** ou **"Prazos Fiscais"**
-2. Verifique se há prazos na lista
-   - Se não houver, crie alguns prazos primeiro
-
-### Teste de Seleção:
-1. Localize os **checkboxes** no canto superior esquerdo de cada card de prazo
-2. Clique no checkbox de **1 prazo**
-   - ✅ Uma **barra de ações em massa** deve aparecer no topo
-   - ✅ Deve mostrar: "1 prazo selecionado"
-3. Clique no checkbox de **mais 2 prazos** (total de 3)
-   - ✅ A barra deve atualizar: "3 prazos selecionados"
-
-### Verificar a Barra de Ações em Massa:
-
-A barra deve ter:
-- **Visual:**
-  - ✅ Gradiente de fundo (azul claro)
-  - ✅ Borda destacada
-  - ✅ Sombra suave
-  - ✅ Animação de entrada suave
-
-- **Conteúdo à esquerda:**
-  - ✅ Checkbox "Selecionar Todos"
-  - ✅ Texto: "X prazos selecionados"
-  - ✅ Subtexto: "Escolha uma ação para aplicar em massa"
-
-- **Botões à direita (4 opções):**
-  1. 🔵 **Marcar Pendente** (borda azul)
-  2. 🟡 **Em Andamento** (borda amarela)
-  3. 🟢 **Concluir** (botão verde sólido)
-  4. 🔴 **Excluir** (botão vermelho)
-
-### Teste de Ações:
-1. Com prazos selecionados, clique em **"Concluir"**
-   - ✅ Deve mostrar toast: "X prazos concluídos com sucesso!"
-   - ✅ Status dos prazos deve mudar para "Concluída"
-   - ✅ Seleção deve ser limpa
-
-2. Selecione outros prazos e clique em **"Excluir"**
-   - ✅ Deve mostrar confirmação: "Tem certeza que deseja excluir X prazos?"
-   - ✅ Ao confirmar, deve excluir e mostrar toast
-
-### Teste "Selecionar Todos":
-1. Clique no checkbox **"Selecionar Todos"** na barra
-   - ✅ Todos os prazos visíveis devem ser selecionados
-2. Clique novamente
-   - ✅ Todos devem ser desmarcados
-
-### Resultado Esperado:
-- ✅ Checkboxes visíveis em todos os cards
-- ✅ Barra aparece/desaparece conforme seleção
-- ✅ 4 botões de ação funcionando
-- ✅ Mensagens de feedback corretas
-- ✅ Design moderno e responsivo
+**Resultado esperado:**
+- Formulário limpo, sem duplicatas
+- Sem campo de valor
+- Todos os campos funcionando normalmente
 
 ---
 
-## 📋 Checklist Geral
+### 4️⃣ Geração Mensal de Obrigações (Automação)
 
-### Sidebar Toggle:
-- [ ] Botão ☰ visível na barra superior
-- [ ] Sidebar fecha ao clicar
-- [ ] Sidebar reabre ao clicar novamente
-- [ ] Transições suaves
+**⚠️ IMPORTANTE: Antes de testar, você precisa executar o SQL no Supabase!**
 
-### Formulário de Clientes:
-- [ ] Campo "Tipo de Atividade" presente
-- [ ] Campo "Estado" com 27 estados
-- [ ] Campo "Cidade" como input de texto
-- [ ] Cidade desabilita sem estado
-- [ ] Cidade limpa ao mudar estado
-- [ ] Validação dos 3 campos funcionando
+**Passo 1 - Aplicar o SQL:**
+1. Abra o arquivo `CORRIGIR_AUTOMACAO.sql` na raiz do projeto
+2. Copie TODO o conteúdo
+3. Acesse o [Painel do Supabase](https://supabase.com/dashboard)
+4. Vá em **SQL Editor**
+5. Cole o código e clique em **Run**
+6. ✅ Deve aparecer "Success. No rows returned"
 
-### Ações em Massa:
-- [ ] Checkboxes nos cards de prazos
-- [ ] Barra aparece ao selecionar
-- [ ] 4 botões de ação visíveis
-- [ ] Ações funcionam corretamente
-- [ ] Mensagens de feedback adequadas
-- [ ] Selecionar todos funciona
+**Passo 2 - Testar a Automação:**
+1. Acesse a página **Prazos**
+2. Clique no botão **Gerar Mensal** (ícone de calendário)
+3. Selecione o mês desejado
+4. Clique em **Gerar**
+   - ✅ Deve aparecer mensagem de sucesso
+   - ✅ Deve mostrar quantos clientes foram processados
+   - ✅ Deve mostrar quantas obrigações foram criadas
 
----
+**Passo 3 - Testar a Lógica de Recuperação:**
+1. Delete manualmente um prazo que foi criado pela automação
+2. Rode a automação novamente para o mesmo mês
+   - ✅ O prazo deletado deve ser RECRIADO
+3. Marque um prazo como **Concluído**
+4. Rode a automação novamente
+   - ✅ O prazo concluído NÃO deve ser duplicado (fica como está)
 
-## 🐛 Problemas Conhecidos Resolvidos
-
-✅ **Sidebar não reabria:** Resolvido com botão na TopBar
-✅ **Cidade era dropdown:** Alterado para input de texto livre
-✅ **Ações em massa básicas:** Expandido para 4 opções de status
-
----
-
-## 💡 Dicas de Teste
-
-1. **Teste em diferentes resoluções:** A barra de ações em massa é responsiva
-2. **Teste com 1 e múltiplos itens:** Mensagens mudam (singular/plural)
-3. **Teste validação:** Tente salvar formulários incompletos
-4. **Teste fluxo completo:** Crie cliente → Crie prazo → Ações em massa
+**Resultado esperado:**
+- Automação funciona sem erros
+- Prazos deletados são recuperados
+- Prazos existentes (mesmo concluídos) não são duplicados
 
 ---
 
-## 📞 Suporte
+## 🐛 Se Algo Não Funcionar
 
-Se encontrar algum problema durante os testes, anote:
-- Qual funcionalidade
-- O que esperava acontecer
-- O que realmente aconteceu
-- Screenshots se possível
+### Problema: Botões de Lista/Blocos não aparecem
+**Solução:** 
+- Verifique se o servidor está rodando (`npm run dev`)
+- Recarregue a página (Ctrl + R)
 
-Bons testes! 🚀
+### Problema: Data de conclusão não limpa ao reabrir
+**Solução:**
+- Limpe o cache do navegador
+- Verifique se há erros no console (F12)
+
+### Problema: Erro "function not found" na automação
+**Solução:**
+- Você ainda não executou o SQL no Supabase
+- Siga o "Passo 1 - Aplicar o SQL" acima
+
+### Problema: Formulário de parcelamento ainda tem duplicatas
+**Solução:**
+- Recarregue a página completamente (Ctrl + Shift + R)
+- Verifique se o arquivo foi salvo corretamente
+
+---
+
+## 📊 Resumo das Correções
+
+| Funcionalidade | Status | Como Verificar |
+|---------------|--------|----------------|
+| Lista/Blocos em Prazos | ✅ | Botões no canto superior direito |
+| Lista/Blocos em Clientes | ✅ | Botões no canto superior direito |
+| Data de Conclusão | ✅ | Concluir → Reabrir → Concluir |
+| Formulário Parcelamento | ✅ | Abrir formulário e contar campos |
+| Automação Mensal | ⚠️ | Precisa executar SQL primeiro |
+
+---
+
+## 🎯 Teste Rápido (5 minutos)
+
+1. ✅ Abra **Prazos** → Alterne entre Lista e Blocos
+2. ✅ Abra **Clientes** → Alterne entre Lista e Blocos
+3. ✅ Em **Prazos** → Concluir um item → Reabrir → Verificar se a data sumiu
+4. ✅ Abra **Parcelamentos** → Novo → Contar se os campos estão corretos
+5. ⚠️ Execute o SQL no Supabase → Teste **Gerar Mensal**
+
+**Se todos os 5 itens funcionarem, está tudo OK! 🎉**

@@ -33,10 +33,10 @@ import { brazilStates, brazilCities, businessActivityLabels } from "@/lib/brazil
 
 const formSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
-  document: z.string().min(1, "CNPJ é obrigatório"),
+  cnpj: z.string().min(1, "CNPJ é obrigatório"),
   email: z.string().email("Email inválido").optional().or(z.literal("")),
   phone: z.string().optional(),
-  tax_regime: z.enum(["simples_nacional", "lucro_presumido", "lucro_real"]),
+  tax_regime: z.enum(["simples_nacional", "lucro_presumido", "lucro_real", "mei"]),
   business_activity: z.enum(["commerce", "service", "both"], {
     required_error: "Selecione o tipo de atividade",
   }),
@@ -53,7 +53,7 @@ export function ClientForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      document: "",
+      cnpj: "",
       email: "",
       phone: "",
       state: "",
@@ -64,7 +64,7 @@ export function ClientForm() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     await createClient.mutateAsync({
       name: values.name,
-      document: values.document,
+      cnpj: values.cnpj,
       tax_regime: values.tax_regime,
       business_activity: values.business_activity,
       state: values.state,
@@ -110,7 +110,7 @@ export function ClientForm() {
             />
             <FormField
               control={form.control}
-              name="document"
+              name="cnpj"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>CNPJ *</FormLabel>

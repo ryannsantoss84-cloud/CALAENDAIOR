@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Eye, Pencil, Trash2, ChevronLeft, ChevronRight, LayoutGrid, List as ListIcon } from "lucide-react";
+import { Search, Eye, Pencil, Trash2, ChevronLeft, ChevronRight, LayoutGrid, List as ListIcon, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,8 +8,6 @@ import { useClients, Client } from "@/hooks/useClients";
 import { ClientDetailsDialog } from "@/components/clients/ClientDetailsDialog";
 import { ClientEditDialog } from "@/components/clients/ClientEditDialog";
 import { DeleteConfirmation } from "@/components/shared/DeleteConfirmation";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import {
   Select,
   SelectContent,
@@ -17,11 +15,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useSorting } from "@/hooks/useSorting";
+import { SortableColumn } from "@/components/shared/SortableColumn";
 
 export default function Clients() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [page, setPage] = useState(1);
-  const pageSize = viewMode === 'grid' ? 9 : 15; // Lista cabe mais itens
+  const pageSize = viewMode === 'grid' ? 9 : 15;
 
   const [searchTerm, setSearchTerm] = useState("");
   const [regimeFilter, setRegimeFilter] = useState<string>("all");
@@ -31,7 +31,8 @@ export default function Clients() {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  // Hook agora recebe paginação e busca
+  const { sortConfig, handleSort, sortData } = useSorting<Client>('name');
+
   const { clients, totalCount, isLoading, deleteClient } = useClients({
     page,
     pageSize,
@@ -40,9 +41,15 @@ export default function Clients() {
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  const filteredClients = regimeFilter === "all"
-    ? clients
-    : clients.filter(c => c.tax_regime === regimeFilter);
+  const filteredClients = sortData(clients.filter(client => {
+    const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.cnpj.includes(searchTerm) ||
+      (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const matchesRegime = regimeFilter === "all" || client.tax_regime === regimeFilter;
+
+    return matchesSearch && matchesRegime;
+  }));
 
   const handleViewDetails = (client: Client) => {
     setSelectedClient(client);
@@ -77,7 +84,7 @@ export default function Clients() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Clientes</h1>
+          <h1 className="text-3xl font-bold tracking-tight gradient-text-primary">Clientes</h1>
           <p className="text-muted-foreground mt-1">
             Base de clientes ({totalCount} registros)
           </p>
@@ -211,10 +218,34 @@ export default function Clients() {
               ) : (
                 <div className="bg-card rounded-xl border shadow-sm overflow-hidden">
                   <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_auto] gap-4 p-4 border-b bg-muted/30 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    <div>Nome / Documento</div>
-                    <div>Email</div>
-                    <div>Telefone</div>
-                    <div>Regime</div>
+                    <SortableColumn
+                      label="Nome / Documento"
+                      sortKey="name"
+                      currentSortKey={sortConfig.key as string}
+                      currentSortDirection={sortConfig.direction}
+                      onSort={handleSort}
+                    />
+                    <SortableColumn
+                      label="Email"
+                      sortKey="email"
+                      currentSortKey={sortConfig.key as string}
+                      currentSortDirection={sortConfig.direction}
+                      onSort={handleSort}
+                    />
+                    <SortableColumn
+                      label="Telefone"
+                      sortKey="phone"
+                      currentSortKey={sortConfig.key as string}
+                      currentSortDirection={sortConfig.direction}
+                      onSort={handleSort}
+                    />
+                    <SortableColumn
+                      label="Regime"
+                      sortKey="tax_regime"
+                      currentSortKey={sortConfig.key as string}
+                      currentSortDirection={sortConfig.direction}
+                      onSort={handleSort}
+                    />
                     <div className="text-right">Ações</div>
                   </div>
                   <div className="divide-y">

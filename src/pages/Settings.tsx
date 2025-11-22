@@ -39,11 +39,12 @@ export default function Settings() {
             }
 
             if (data) {
+                const settingsData = data as any;
                 setSettings({
-                    office_name: data.office_name || "",
-                    office_document: data.office_document || "",
-                    default_weekend_handling: data.default_weekend_handling || "next_business_day",
-                    auto_create_recurrences: data.auto_create_recurrences ?? true,
+                    office_name: settingsData.office_name || "",
+                    office_document: settingsData.office_document || "",
+                    default_weekend_handling: settingsData.default_weekend_handling || "next_business_day",
+                    auto_create_recurrences: settingsData.auto_create_recurrences ?? true,
                 });
             }
         } catch (error: any) {
@@ -93,7 +94,7 @@ export default function Settings() {
     return (
         <div className="space-y-6 max-w-3xl animate-in fade-in duration-500">
             <div>
-                <h1 className="text-3xl font-bold flex items-center gap-2">
+                <h1 className="text-3xl font-bold tracking-tight gradient-text-primary flex items-center gap-2">
                     <SettingsIcon className="h-8 w-8" />
                     Configurações do Sistema
                 </h1>

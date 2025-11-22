@@ -44,6 +44,7 @@ const formSchema = z.object({
   description: z.string().optional(),
   client_id: z.string().min(1, "Cliente é obrigatório"),
   due_date: z.string().min(1, "Data de vencimento é obrigatória"),
+  reference_date: z.string().optional(),
   recurrence: z.enum(["none", "monthly", "quarterly", "semiannual", "annual"]),
   notes: z.string().optional(),
   responsible: z.string().optional(),
@@ -77,9 +78,9 @@ export function DeadlineForm() {
   const adjustedDate =
     watchedDueDate && dueDateIsWeekend
       ? adjustDueDateForWeekend(
-          parseISO(watchedDueDate),
-          watchedWeekendHandling
-        )
+        parseISO(watchedDueDate),
+        watchedWeekendHandling
+      )
       : null;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -87,9 +88,9 @@ export function DeadlineForm() {
     const originalDueDate = isWeekend(dueDate) ? values.due_date : null;
     const adjustedDueDate = isWeekend(dueDate)
       ? format(
-          adjustDueDateForWeekend(dueDate, values.weekend_handling),
-          "yyyy-MM-dd"
-        )
+        adjustDueDateForWeekend(dueDate, values.weekend_handling),
+        "yyyy-MM-dd"
+      )
       : values.due_date;
 
     const deadline = await createDeadline.mutateAsync({
@@ -97,7 +98,9 @@ export function DeadlineForm() {
       type: values.type,
       description: values.description,
       client_id: values.client_id,
+      client_id: values.client_id,
       due_date: adjustedDueDate,
+      reference_date: values.reference_date ? `${values.reference_date}-01` : null,
       original_due_date: originalDueDate,
       status: "pending",
       recurrence: values.recurrence,
@@ -243,6 +246,20 @@ export function DeadlineForm() {
                     <FormLabel>Data de Vencimento *</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="reference_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mês de Referência (Competência)</FormLabel>
+                    <FormControl>
+                      <Input type="month" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

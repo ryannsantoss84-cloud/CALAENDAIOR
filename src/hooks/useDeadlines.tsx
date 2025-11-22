@@ -17,6 +17,7 @@ export interface Deadline {
   responsible?: string;
   weekend_handling?: string;
   original_due_date?: string;
+  reference_date?: string;
   amount?: number;
   created_at: string;
   updated_at: string;

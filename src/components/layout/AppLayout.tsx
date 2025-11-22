@@ -9,24 +9,32 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-muted/20">
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-background to-muted/10">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out">
-          {/* Header Flutuante Minimalista */}
-          <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 px-6 backdrop-blur-xl transition-all">
-            <SidebarTrigger />
+          {/* Header Corporativo Elegante com Glassmorphism */}
+          <header className="sticky top-0 z-50 flex h-16 items-center gap-4 glass-nav shadow-elegant">
+            <SidebarTrigger className="hover:bg-primary/10 transition-colors" />
             <div className="flex-1">
-              {/* TopBar content (Breadcrumbs, etc) */}
               <TopBar />
             </div>
           </header>
 
-          {/* Conteúdo Principal Centralizado */}
-          <main className="flex-1 p-6 md:p-8 overflow-x-hidden">
-            <div className="mx-auto max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {/* Conteúdo Principal com Animação Suave */}
+          <main className="flex-1 p-6 md:p-8 lg:p-10 overflow-x-hidden">
+            <div className="corporate-container animate-slide-up">
               {children}
             </div>
           </main>
+
+          {/* Footer Corporativo Sutil */}
+          <footer className="border-t border-border/50 bg-card/30 backdrop-blur-sm py-4 px-6">
+            <div className="corporate-container">
+              <p className="text-xs text-muted-foreground text-center">
+                © 2025 Sistema de Controle Fiscal. Todos os direitos reservados.
+              </p>
+            </div>
+          </footer>
         </div>
       </div>
     </SidebarProvider>

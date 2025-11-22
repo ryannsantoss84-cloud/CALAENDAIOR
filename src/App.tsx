@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
+import { useAutoGenerate } from "./hooks/useAutoGenerate";
 import Dashboard from "./pages/Dashboard";
 import Deadlines from "./pages/Deadlines";
 import Clients from "./pages/Clients";
@@ -17,24 +18,33 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const AppContent = () => {
+  // Hook de automação - gera obrigações automaticamente
+  useAutoGenerate();
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<AppLayout><Dashboard /></AppLayout>} />
+        <Route path="/deadlines" element={<AppLayout><Deadlines /></AppLayout>} />
+        <Route path="/clients" element={<AppLayout><Clients /></AppLayout>} />
+        <Route path="/installments" element={<AppLayout><Installments /></AppLayout>} />
+        <Route path="/calendar" element={<AppLayout><Calendar /></AppLayout>} />
+        <Route path="/analytics" element={<AppLayout><Analytics /></AppLayout>} />
+        <Route path="/templates" element={<AppLayout><Templates /></AppLayout>} />
+        <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<AppLayout><Dashboard /></AppLayout>} />
-          <Route path="/deadlines" element={<AppLayout><Deadlines /></AppLayout>} />
-          <Route path="/clients" element={<AppLayout><Clients /></AppLayout>} />
-          <Route path="/installments" element={<AppLayout><Installments /></AppLayout>} />
-          <Route path="/calendar" element={<AppLayout><Calendar /></AppLayout>} />
-          <Route path="/analytics" element={<AppLayout><Analytics /></AppLayout>} />
-          <Route path="/templates" element={<AppLayout><Templates /></AppLayout>} />
-          <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AppContent />
     </TooltipProvider>
   </QueryClientProvider>
 );

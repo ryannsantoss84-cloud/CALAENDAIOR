@@ -58,27 +58,27 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border/40 bg-card/50 backdrop-blur-xl">
+    <Sidebar collapsible="icon" className="border-r border-border/40 glass-nav">
       <SidebarHeader className="p-4">
         <div className={`flex items-center ${state === "collapsed" ? "justify-center" : "gap-3"} transition-all duration-300`}>
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl gradient-primary text-primary-foreground shadow-elegant">
             <Command className="h-6 w-6" />
           </div>
           {state !== "collapsed" && (
             <div className="flex flex-col fade-in animate-in slide-in-from-left-2">
-              <span className="font-bold text-lg tracking-tight">ControlFiscal</span>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">Enterprise</span>
+              <span className="font-bold text-lg tracking-tight gradient-text-primary">ControlFiscal</span>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Enterprise</span>
             </div>
           )}
         </div>
       </SidebarHeader>
 
-      <Separator className="opacity-50" />
+      <Separator className="opacity-30" />
 
       <SidebarContent className="px-2 py-4 space-y-6">
         {/* Grupo Principal */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 px-4 mb-2">
+          <SidebarGroupLabel className="text-xs font-bold uppercase tracking-widest text-primary/70 px-4 mb-2">
             Dashboard
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -93,7 +93,7 @@ export function AppSidebar() {
                       h-10 rounded-lg transition-all duration-200
                       ${isActive(item.url)
                         ? "bg-primary/10 text-primary font-medium shadow-sm"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground font-medium"
                       }
                     `}
                   >
@@ -113,7 +113,7 @@ export function AppSidebar() {
 
         {/* Grupo Operacional */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 px-4 mb-2">
+          <SidebarGroupLabel className="text-xs font-bold uppercase tracking-widest text-emerald-600/70 dark:text-emerald-400/70 px-4 mb-2">
             Operacional
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -127,14 +127,17 @@ export function AppSidebar() {
                     className={`
                       h-10 rounded-lg transition-all duration-200
                       ${isActive(item.url)
-                        ? "bg-primary/10 text-primary font-medium shadow-sm"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        ? "bg-primary/10 text-primary font-semibold shadow-sm border border-primary/20"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground font-medium"
                       }
                     `}
                   >
                     <NavLink to={item.url}>
                       <item.icon className={`h-5 w-5 ${isActive(item.url) ? "text-primary" : "text-muted-foreground"}`} />
                       <span>{item.title}</span>
+                      {isActive(item.url) && state !== "collapsed" && (
+                        <ChevronRight className="ml-auto h-4 w-4 text-primary" />
+                      )}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -145,7 +148,7 @@ export function AppSidebar() {
 
         {/* Grupo Sistema */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 px-4 mb-2">
+          <SidebarGroupLabel className="text-xs font-bold uppercase tracking-widest text-violet-600/70 dark:text-violet-400/70 px-4 mb-2">
             Sistema
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -159,14 +162,17 @@ export function AppSidebar() {
                     className={`
                       h-10 rounded-lg transition-all duration-200
                       ${isActive(item.url)
-                        ? "bg-primary/10 text-primary font-medium shadow-sm"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        ? "bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium shadow-sm"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground font-medium"
                       }
                     `}
                   >
                     <NavLink to={item.url}>
-                      <item.icon className={`h-5 w-5 ${isActive(item.url) ? "text-primary" : "text-muted-foreground"}`} />
+                      <item.icon className={`h-5 w-5 ${isActive(item.url) ? "text-violet-600 dark:text-violet-400" : "text-muted-foreground"}`} />
                       <span>{item.title}</span>
+                      {isActive(item.url) && state !== "collapsed" && (
+                        <ChevronRight className="ml-auto h-4 w-4 opacity-50" />
+                      )}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -180,7 +186,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors"
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive transition-all font-medium rounded-lg h-10"
               tooltip="Sair do Sistema"
             >
               <LogOut className="h-5 w-5" />

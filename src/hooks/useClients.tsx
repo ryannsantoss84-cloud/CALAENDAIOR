@@ -8,12 +8,14 @@ export interface Client {
   user_id?: string;
   name: string;
   document: string;
+  cnpj: string;
   email?: string;
   phone?: string;
-  tax_regime?: "simples_nacional" | "lucro_presumido" | "lucro_real";
+  tax_regime?: "simples_nacional" | "lucro_presumido" | "lucro_real" | "mei";
   business_activity?: "commerce" | "service" | "both";
   state?: string;
   city?: string;
+  status?: "active" | "inactive";
   created_at: string;
   updated_at: string;
 }
@@ -38,7 +40,7 @@ export function useClients(options: UseClientsOptions = {}) {
         .order("created_at", { ascending: false });
 
       if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,document.ilike.%${searchTerm}%`);
+        query = query.or(`name.ilike.%${searchTerm}%,cnpj.ilike.%${searchTerm}%`);
       }
 
       const from = (page - 1) * pageSize;
@@ -48,7 +50,7 @@ export function useClients(options: UseClientsOptions = {}) {
 
       if (error) throw error;
       return {
-        clients: data as Client[],
+        clients: (data as any) as Client[],
         totalCount: count || 0
       };
     },
@@ -57,10 +59,10 @@ export function useClients(options: UseClientsOptions = {}) {
 
   const createClient = useMutation({
     mutationFn: async (client: Omit<Client, "id" | "user_id" | "created_at" | "updated_at">) => {
-      // 1. Criar o cliente
+      // 1. Criar o cliente (sem user_id para desenvolvimento)
       const { data: newClient, error: clientError } = await supabase
         .from("clients")
-        .insert([client])
+        .insert([client] as any)
         .select()
         .single();
 
@@ -179,7 +181,7 @@ export function useClients(options: UseClientsOptions = {}) {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       toast({
         title: "Cliente criado com sucesso!",
-        description: client.tax_regime ? "Obrigações padrão foram geradas automaticamente." : undefined
+        description: "Obrigações padrão foram geradas automaticamente (se aplicável)."
       });
     },
     onError: (error: Error) => {
